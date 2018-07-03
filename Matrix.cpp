@@ -158,6 +158,9 @@ Matrix::Matrix(){
 
 }
 Matrix::Matrix(int m, int n){
+	if(m < 1 || n < 1){
+		throw -1;
+	}
 	this->shape = Shape(m, n);
 	this->data = new float*[this->shape.m];
 	for(int i = 0; i < this->shape.m; ++i){
@@ -256,7 +259,10 @@ float Matrix::getData(int m, int n) const {
 
 // Operators
 Matrix Matrix::operator*=(const float &rhs){
-	*this = *this * rhs;
+	Matrix A = *this;
+	Matrix B(this->shape);
+	B.populate(rhs);
+	*this = mult(A, B);
 	return *this;
 }
 Matrix Matrix::operator/=(const float &rhs){
