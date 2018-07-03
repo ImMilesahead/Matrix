@@ -4,7 +4,6 @@
 #include <iostream>
 
 
-
 struct Shape {
 	Shape(int m, int n): m(m), n(n) {}
 	Shape(){}
@@ -36,6 +35,7 @@ class Matrix {
 	 Matrix makeThisFuckerTheSameShape(const Matrix &) const;
 	 Matrix T() const;
 	 Matrix transpose();
+	 float sum();
 
 	 friend std::ostream& operator<<(std::ostream&, const Matrix&);
 	 float *operator[](int);
@@ -85,7 +85,7 @@ Matrix mult(Matrix&, Matrix&);
 Matrix div(Matrix&, Matrix&);
 Matrix power(float, Matrix);
 Matrix trans(const Matrix &);
-
+Matrix mlog(const Matrix &);
 
 
 #endif	// MATRIX_H
