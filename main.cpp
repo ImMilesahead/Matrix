@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-float e = 2.71828f;
+double e = 2.71828f;
 
 
 std::pair<Matrix, Matrix> relu(const Matrix &A){
@@ -20,11 +20,11 @@ Matrix reluBackwards(Matrix dA, Matrix cache){
 	Matrix dZ = dA * r;
 	return dZ;
 }
-std::pair<Matrix, Matrix> sigmoid(const Matrix &A){
-	Matrix Z = 1 / ( 1 + power(e, -A));
+std::pair<Matrix, Matrix> sigmoid(const Matrix &Z){
+	Matrix A = 1 / ( 1 + power(e, -Z));
 	std::pair<Matrix, Matrix> r;
-	r.first = Z;
-	r.second = A;
+	r.first = A;
+	r.second = Z;
 	return r;
 }
 Matrix sigmoidBackwards(Matrix dA, Matrix cache){
@@ -33,22 +33,22 @@ Matrix sigmoidBackwards(Matrix dA, Matrix cache){
 	Matrix dZ = dA * s * (1 - s);
 	return dZ;
 }
-
 std::map<std::string, Matrix> initializeParameters(std::vector<int> layerDims){
 	std::map<std::string, Matrix> parameters;
 	for(int l = 1; l < layerDims.size(); ++l){
 		Matrix W(layerDims[l], layerDims[l-1]);
-		W.rand();
+		W.randn();
+		std::cout << W << std::endl;
 		std::string index = "W" + std::to_string(l);
 		parameters[index] = W;
 		Matrix B(layerDims[l], 1);
 		B.populate(0.0f);
+		std::cout << B << std::endl;
 		index = "b" + std::to_string(l);
 		parameters[index] = B;
 	}
 	return parameters;
 }
-
 std::pair<Matrix, std::vector<Matrix> > linearForward(Matrix A, Matrix W, Matrix b){
 	Matrix Z = W.dot(A) + b;
 	std::vector<Matrix> cache;
@@ -101,7 +101,6 @@ std::pair<Matrix, std::vector<std::pair<std::vector<Matrix>, Matrix> > > forward
 	toReturn.second = caches;
 	return toReturn;
 }
-
 std::vector<Matrix> linearBackwards(Matrix dZ, std::vector<Matrix> cache){
 	Matrix A_prev = cache[0];
 	Matrix W = cache[1];
@@ -121,7 +120,6 @@ std::vector<Matrix> linearBackwards(Matrix dZ, std::vector<Matrix> cache){
 	r.push_back(db);
 	return r;
 }
-
 std::vector<Matrix> linearActivateBackwards(Matrix dA, std::pair<std::vector<Matrix>, Matrix> cache, std::string activation){
 	std::vector<Matrix> linCache = cache.first;
 	Matrix actCache = cache.second;
@@ -135,12 +133,11 @@ std::vector<Matrix> linearActivateBackwards(Matrix dA, std::pair<std::vector<Mat
 	}
 	return linearBackwards(dZ, linCache);
 }
-
 std::map<std::string, Matrix> backPropagation(Matrix AL, Matrix Y, std::vector<std::pair<std::vector<Matrix>, Matrix> > caches){
 	std::map<std::string, Matrix> grads;
 	int L = caches.size();
 	int nX = AL.getShape().n;
-	Matrix dAL = - ((Y / AL) - ((1 - Y) / (1 - AL)));
+	Matrix dAL = -((Y / AL) - ((1 - Y) / (1 - AL)));
 	std::pair<std::vector<Matrix>, Matrix> currentCache = caches[L-1];
 	std::vector<Matrix> t = linearActivateBackwards(dAL, currentCache, "SIGMOID");
 	grads["dA" + std::to_string(L-1)] = t[0];
@@ -155,8 +152,7 @@ std::map<std::string, Matrix> backPropagation(Matrix AL, Matrix Y, std::vector<s
 	}
 	return grads;
 }
-
-std::map<std::string, Matrix> updateParameters(std::map<std::string, Matrix> parameters, std::map<std::string, Matrix> grads, float learningRate){
+std::map<std::string, Matrix> updateParameters(std::map<std::string, Matrix> parameters, std::map<std::string, Matrix> grads, double learningRate){
 	int L = parameters.size() / 2;
 	for(int l = 1; l <= L; ++l){
 		parameters["W" + std::to_string(l)] = parameters["W" + std::to_string(l)] - (grads["dW" + std::to_string(l)] * learningRate);
@@ -164,23 +160,21 @@ std::map<std::string, Matrix> updateParameters(std::map<std::string, Matrix> par
 	}
 	return parameters;
 }
-
-float compute_cost(Matrix AL, Matrix Y){
+double compute_cost(Matrix AL, Matrix Y){
 	int n = Y.getShape().n;
 	Matrix preSum = Y * mlog(AL) + (1 - Y) * mlog(1 - AL);
-	float cost = preSum.sum()/n;
+	double cost = preSum.sum()/n;
 	return -cost;
 }
-
 // 				parameters					costs
-std::pair<std::map<std::string, Matrix>, std::vector<float> > model(Matrix X, Matrix Y, std::vector<int> layerDims, float learningRate, int numIterations, bool printCost){
-	std::vector<float> costs;
+std::pair<std::map<std::string, Matrix>, std::vector<double> > model(Matrix X, Matrix Y, std::vector<int> layerDims, double learningRate, int numIterations, bool printCost){
+	std::vector<double> costs;
 	std::map<std::string, Matrix> parameters = initializeParameters(layerDims);
 	for(int i = 0; i < numIterations; ++i){
 		std::pair<Matrix, std::vector<std::pair<std::vector<Matrix>, Matrix> > > ALCaches = forwardPropagation(X, parameters);
 		Matrix AL = ALCaches.first;
 		std::vector<std::pair<std::vector<Matrix>, Matrix> > caches = ALCaches.second;
-		float cost = compute_cost(AL, Y);
+		double cost = compute_cost(AL, Y);
 		std::map<std::string, Matrix> grads = backPropagation(AL, Y, caches);
 		parameters = updateParameters(parameters, grads, learningRate);
 		if (i % 1000 == 0){
@@ -189,14 +183,14 @@ std::pair<std::map<std::string, Matrix>, std::vector<float> > model(Matrix X, Ma
 			}
 			costs.push_back(cost);
 			if(cost < 0.00001f){
-				std::pair<std::map<std::string, Matrix>, std::vector<float> > temp;
+				std::pair<std::map<std::string, Matrix>, std::vector<double> > temp;
 				temp.first = parameters;
 				temp.second = costs;
 				return temp;
 			}
 		}
 	}
-	std::pair<std::map<std::string, Matrix>, std::vector<float> > temp;
+	std::pair<std::map<std::string, Matrix>, std::vector<double> > temp;
 	temp.first = parameters;
 	temp.second = costs;
 	return temp;
@@ -204,7 +198,7 @@ std::pair<std::map<std::string, Matrix>, std::vector<float> > model(Matrix X, Ma
 
 int main(){
 	//			parameters						costs
-	std::pair<std::map<std::string, Matrix>, std::vector<float> > paramCost;
+	std::pair<std::map<std::string, Matrix>, std::vector<double> > paramCost;
 	std::vector<int> layerDims;
 	layerDims.push_back(2);
 	layerDims.push_back(3);
@@ -218,12 +212,12 @@ int main(){
 	X[0][3] = 1.0f;
 	X[1][3] = 1.0f;
 
-	Matrix Y(layerDims[2], nX);
+	Matrix Y(layerDims[layerDims.size()-1], nX);
 	Y.populate(0);
 	Y[0][1] = 1.0f;
 	Y[0][2] = 1.0f;
 
-	std::pair<std::map<std::string, Matrix>, std::vector<float> > r = model(X, Y, layerDims, 0.5f, 100000, true);
+	std::pair<std::map<std::string, Matrix>, std::vector<double> > r = model(X, Y, layerDims, 1.0f, 100000, true);
 	std::map<std::string, Matrix> parameters = r.first;
 
 	std::pair<Matrix, std::vector<std::pair<std::vector<Matrix>, Matrix> > > fr;
@@ -235,6 +229,12 @@ int main(){
 	std::cout << X << std::endl;
 	std::cout << Y << std::endl;
 	std::cout << output << std::endl;
+
+	for(int i = 1; i < layerDims.size(); ++i){
+		std::cout << "W" << i << std::endl << parameters["W" + std::to_string(i)] << std::endl;
+		std::cout << "b" << i << std::endl << parameters["b" + std::to_string(i)] << std::endl;
+
+	}
 
 	return 0;
 }

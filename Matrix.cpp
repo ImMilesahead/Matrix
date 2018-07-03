@@ -132,7 +132,7 @@ Matrix lessThanEqual(Matrix &A, Matrix &B){
 	}
 	return newMatrix;
 }
-Matrix power(float base, Matrix p){
+Matrix power(double base, Matrix p){
 	Shape shape = p.getShape();
 	Matrix newMatrix(shape);
 	for(int i = 0; i < shape.m; ++i){
@@ -164,25 +164,31 @@ Matrix mlog(const Matrix &A){
 	return newMatrix;
 }
 Matrix::Matrix(){
-	srand(time(0));
+	std::srand(std::time(0));
 }
 Matrix::Matrix(int m, int n){
-	srand(time(0));
+	std::srand(std::time(0));
 	if(m < 1 || n < 1){
 		throw -1;
 	}
 	this->shape = Shape(m, n);
-	this->data = new float*[this->shape.m];
+	this->data = new double*[this->shape.m];
 	for(int i = 0; i < this->shape.m; ++i){
-		this->data[i] = new float[this->shape.n];
+		this->data[i] = new double[this->shape.n];
+		for(int j = 0; j < this->shape.n; ++j){
+			this->data[i][j] = 1.0f;
+		}
 	}
 }
 Matrix::Matrix(Shape shape){
-	srand(time(0));
+	std::srand(std::time(0));
 	this->shape = Shape(shape.m, shape.n);
-	this->data = new float*[this->shape.m];
+	this->data = new double*[this->shape.m];
 	for(int i = 0; i < this->shape.m; ++i){
-		this->data[i] = new float[this->shape.n];
+		this->data[i] = new double[this->shape.n];
+		for(int j = 0; j < shape.n; ++j){
+			this->data[i][j] = 1.0f;
+		}
 	}
 }
 Matrix::~Matrix(){
@@ -200,12 +206,16 @@ Matrix::~Matrix(){
 void Matrix::rand(){
 	for(int m = 0; m < this->shape.m; ++m){
 		for(int n = 0; n < this->shape.n; ++n){
-			this->data[m][n] = static_cast<float>(std::rand() % 100) / 1000 + 0.000000001;
+			this->data[m][n] = static_cast<double>(std::rand() % 200) / 100 - 1 + 0.000000001;
 		}
 	}
 }
 void Matrix::randn(){
-
+	for(int m = 0; m < this->shape.m; ++m){
+		for(int n = 0; n < this->shape.n; ++n){
+			this->data[m][n] = static_cast<double>(std::rand() % 250) / 100 + 0.000000001;
+		}
+	}
 }
 Matrix Matrix::transpose(){
 	*this = this->T();
@@ -214,7 +224,7 @@ Matrix Matrix::transpose(){
 Matrix Matrix::T() const {
 	return trans(*this);
 }
-void Matrix::populate(float init){
+void Matrix::populate(double init){
 	for(int m = 0; m < this->shape.m; ++m){
 		for(int n = 0; n < this->shape.n; ++n){
 			this->data[m][n] = init;
@@ -236,7 +246,7 @@ Matrix Matrix::dot(const Matrix &other) const {
 	Matrix newMatrix(newShape);
 	for(int nm = 0; nm < newShape.m; ++nm){
 		for(int nn = 0; nn < newShape.n; ++nn){
-			float value = 0;
+			double value = 0;
 			// calculate Value
 			for(int i = 0; i < this->shape.n; ++i){
 				value += this->data[nm][i] * other.data[i][nn];
@@ -267,11 +277,11 @@ Matrix Matrix::makeThisFuckerTheSameShape(const Matrix &A) const {
 	return newMatrix;
 
 }
-float Matrix::getData(int m, int n) const {
+double Matrix::getData(int m, int n) const {
 	return this->data[m][n];
 }
-float Matrix::sum(){
-	float sum = 0.0f;
+double Matrix::sum(){
+	double sum = 0.0f;
 	for(int i = 0; i < this->shape.m; ++i){
 		for(int j = 0; j < this->shape.n; ++j){
 			sum += this->data[i][j];
@@ -317,7 +327,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix &m){
 }
 
 // CONDITIONALS
-Matrix Matrix::operator>(const float &rhs) const {
+Matrix Matrix::operator>(const double &rhs) const {
 	Matrix A = *this;
 	Matrix B(this->shape);
 	B.populate(rhs);
@@ -328,7 +338,7 @@ Matrix Matrix::operator>(const Matrix &rhs) const {
 	Matrix B = rhs;
 	return greaterThan(A, B);
 }
-Matrix Matrix::operator<(const float &rhs) const {
+Matrix Matrix::operator<(const double &rhs) const {
 	Matrix A = *this;
 	Matrix B(this->shape);
 	B.populate(rhs);
@@ -339,7 +349,7 @@ Matrix Matrix::operator<(const Matrix &rhs) const {
 	Matrix B = rhs;
 	return lessThan(A, B);
 }
-Matrix Matrix::operator>=(const float &rhs) const {
+Matrix Matrix::operator>=(const double &rhs) const {
 	Matrix A = *this;
 	Matrix B(this->shape);
 	B.populate(rhs);
@@ -350,7 +360,7 @@ Matrix Matrix::operator>=(const Matrix &rhs) const {
 	Matrix B = rhs;
 	return greaterThanEqual(A, B);
 }
-Matrix Matrix::operator<=(const float &rhs) const {
+Matrix Matrix::operator<=(const double &rhs) const {
 	Matrix A = *this;
 	Matrix B(this->shape);
 	B.populate(rhs);
@@ -362,26 +372,26 @@ Matrix Matrix::operator<=(const Matrix &rhs) const {
 	return lessThanEqual(A, B);
 }
 // INDEX ACCESSOR
-float *Matrix::operator[](int x){
+double *Matrix::operator[](int x){
    return this->data[x];
 }
 // ARITHMATIC
-Matrix Matrix::operator*=(const float &rhs){
+Matrix Matrix::operator*=(const double &rhs){
 	Matrix A = *this;
 	Matrix B(this->shape);
 	B.populate(rhs);
 	*this = mult(A, B);
 	return *this;
 }
-Matrix Matrix::operator/=(const float &rhs){
+Matrix Matrix::operator/=(const double &rhs){
 	*this = *this / rhs;
 	return *this;
 }
-Matrix Matrix::operator-=(const float &rhs){
+Matrix Matrix::operator-=(const double &rhs){
 	*this = *this - rhs;
 	return *this;
 }
-Matrix Matrix::operator+=(const float &rhs){
+Matrix Matrix::operator+=(const double &rhs){
 	*this = *this + rhs;
 	return *this;
 }
@@ -401,7 +411,7 @@ Matrix Matrix::operator+=(const Matrix &rhs){
 	*this = *this + rhs;
 	return *this;
 }
-Matrix Matrix::operator*(const float &rhs) const{
+Matrix Matrix::operator*(const double &rhs) const{
 	Matrix A = *this;
 	Matrix B(this->shape);
 	B.populate(rhs);
@@ -412,7 +422,7 @@ Matrix Matrix::operator*(const Matrix &other) const {
 	Matrix B = other;
 	return mult(A, B);
 }
-Matrix Matrix::operator/(const float &rhs) const{
+Matrix Matrix::operator/(const double &rhs) const{
 	Matrix A = *this;
 	Matrix B(this->shape);
 	B.populate(rhs);
@@ -423,7 +433,7 @@ Matrix Matrix::operator/(const Matrix &other) const {
 	Matrix B = other;
 	return div(A, B);
 }
-Matrix Matrix::operator-(const float &rhs) const{
+Matrix Matrix::operator-(const double &rhs) const{
 	Matrix A = *this;
 	Matrix B(this->shape);
 	B.populate(rhs);
@@ -433,7 +443,7 @@ Matrix Matrix::operator-(const Matrix &other) const {
 	Matrix A = *this;
 	Matrix B = other;return sub(A, B);
 }
-Matrix Matrix::operator+(const float &rhs) const{
+Matrix Matrix::operator+(const double &rhs) const{
 	Matrix A = *this;
 	Matrix B(this->shape);
 	B.populate(rhs);
@@ -451,13 +461,13 @@ Matrix Matrix::operator-() const{
 	return sub(B, A);
 }
 // NON MEMBER ARITHMATIC
-Matrix operator+(const float &lhs, const Matrix &rhs){
+Matrix operator+(const double &lhs, const Matrix &rhs){
 	return rhs + lhs;
 }
 Matrix operator+(const int &lhs, const Matrix &rhs){
 	return rhs + lhs;
 }
-Matrix operator/(const float &lhs, const Matrix &rhs){
+Matrix operator/(const double &lhs, const Matrix &rhs){
 	Matrix A = rhs;
 	Matrix B(rhs.getShape());
 	B.populate(lhs);
@@ -466,18 +476,18 @@ Matrix operator/(const float &lhs, const Matrix &rhs){
 Matrix operator/(const int &lhs, const Matrix &rhs){
 	Matrix A = rhs;
 	Matrix B(rhs.getShape());
-	B.populate(static_cast<float>(lhs));
+	B.populate(static_cast<double>(lhs));
 	return B / A;
 }
-Matrix operator-(const float &lhs, const Matrix &rhs){
+Matrix operator-(const double &lhs, const Matrix &rhs){
 	// TODO is a not very effecient, still O(N) but more like O(2N)
 	return -rhs + lhs;
 }
 Matrix operator-(const int &lhs, const Matrix &rhs){
 	// TODO is not ver effecient currently runs in O(2N) could run in O(N)
-	return -rhs + static_cast<float>(lhs);
+	return -rhs + static_cast<double>(lhs);
 }
-Matrix operator*(const float &lhs, const Matrix &rhs){
+Matrix operator*(const double &lhs, const Matrix &rhs){
 	return rhs * lhs;
 }
 Matrix operator*(const int &lhs, const Matrix &rhs){

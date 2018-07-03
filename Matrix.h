@@ -20,7 +20,7 @@ struct Shape {
 class Matrix {
  private:
 	 Shape shape;
-	float **data;
+	double **data;
  public:
 	 Matrix();
 	 Matrix(Shape);
@@ -28,51 +28,51 @@ class Matrix {
 	 ~Matrix();
 	 void rand();
 	 void randn();
-	 void populate(float);
+	 void populate(double);
 	 Shape getShape() const;
-	 float getData(int, int) const;
+	 double getData(int, int) const;
 	 Matrix dot(const Matrix&) const;
 	 Matrix makeThisFuckerTheSameShape(const Matrix &) const;
 	 Matrix T() const;
 	 Matrix transpose();
-	 float sum();
+	 double sum();
 
 	 friend std::ostream& operator<<(std::ostream&, const Matrix&);
-	 float *operator[](int);
-	 Matrix operator*=(const float&);
-	 Matrix operator/=(const float&);
-	 Matrix operator-=(const float&);
-	 Matrix operator+=(const float&);
+	 double *operator[](int);
+	 Matrix operator*=(const double&);
+	 Matrix operator/=(const double&);
+	 Matrix operator-=(const double&);
+	 Matrix operator+=(const double&);
 	 Matrix operator*=(const Matrix&);
 	 Matrix operator/=(const Matrix&);
 	 Matrix operator-=(const Matrix&);
 	 Matrix operator+=(const Matrix&);
- 	 Matrix operator*(const float &other) const;
- 	 Matrix operator/(const float &other) const;
- 	 Matrix operator-(const float &other) const;
- 	 Matrix operator+(const float &other) const;
+ 	 Matrix operator*(const double &other) const;
+ 	 Matrix operator/(const double &other) const;
+ 	 Matrix operator-(const double &other) const;
+ 	 Matrix operator+(const double &other) const;
  	 Matrix operator*(const Matrix &other) const;
  	 Matrix operator/(const Matrix &other) const;
  	 Matrix operator-(const Matrix &other) const;
  	 Matrix operator+(const Matrix &other) const;
-	 Matrix operator>(const float &rhs) const;
+	 Matrix operator>(const double &rhs) const;
 	 Matrix operator>(const Matrix &rhs) const;
-	 Matrix operator<(const float &rhs) const;
+	 Matrix operator<(const double &rhs) const;
 	 Matrix operator<(const Matrix &rhs) const;
-	 Matrix operator>=(const float &rhs) const;
+	 Matrix operator>=(const double &rhs) const;
 	 Matrix operator>=(const Matrix &rhs) const;
-	 Matrix operator<=(const float &rhs) const;
+	 Matrix operator<=(const double &rhs) const;
 	 Matrix operator<=(const Matrix &rhs) const;
 
 	 Matrix operator-() const;
 
- 	 friend Matrix operator+(const float&, const Matrix&);
+ 	 friend Matrix operator+(const double&, const Matrix&);
  	 friend Matrix operator+(const int&, const Matrix&);
- 	 friend Matrix operator-(const float&, const Matrix&);
+ 	 friend Matrix operator-(const double&, const Matrix&);
  	 friend Matrix operator-(const int&, const Matrix&);
- 	 friend Matrix operator/(const float&, const Matrix&);
+ 	 friend Matrix operator/(const double&, const Matrix&);
  	 friend Matrix operator/(const int&, const Matrix&);
- 	 friend Matrix operator*(const float&, const Matrix&);
+ 	 friend Matrix operator*(const double&, const Matrix&);
  	 friend Matrix operator*(const int&, const Matrix&);
 
 };
@@ -83,7 +83,7 @@ Matrix add(Matrix&, Matrix&);
 Matrix sub(Matrix&, Matrix&);
 Matrix mult(Matrix&, Matrix&);
 Matrix div(Matrix&, Matrix&);
-Matrix power(float, Matrix);
+Matrix power(double, Matrix);
 Matrix trans(const Matrix &);
 Matrix mlog(const Matrix &);
 
