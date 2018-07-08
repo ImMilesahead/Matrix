@@ -1,8 +1,8 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include <iostream>
 
+#include <iostream>
 
 struct Shape {
 	Shape(int m, int n): m(m), n(n) {}
