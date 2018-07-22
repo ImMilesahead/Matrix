@@ -68,7 +68,7 @@ Matrix div(Matrix &A, Matrix &B){
 	Matrix newMatrix(aShape);
 	for(int i = 0; i < aShape.m; ++i){
 		for(int j = 0; j < aShape.n; ++j){
-			newMatrix[i][j] = A[i][j] / B[i][j];
+			newMatrix[i][j] = A[i][j] / (B[i][j] + 1e-6);
 		}
 	}
 	return newMatrix;
